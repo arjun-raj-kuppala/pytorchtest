@@ -22,6 +22,7 @@ jobs:
     runs-on: self-hosted
     env:
       JOB_BASE_NAME: pytorch-linux-bionic-rocm4.2-py3.6-test
+      COMPACT_JOB_NAME: pytorch-linux-bionic-rocm4.2-py3.6-test
       SCCACHE_BUCKET: ossci-compiler-cache-circleci-v2
       CUSTOM_TEST_ARTIFACT_BUILD_DIR: build/custom_test_artifacts
       TORCH_CUDA_ARCH_LIST: 5.2
@@ -44,6 +45,7 @@ jobs:
           docker run \
             -e BUILD_ENVIRONMENT \
             -e JOB_BASE_NAME \
+            -e COMPACT_JOB_NAME \
             -e MAX_JOBS="$(nproc --ignore=2)" \
             -e SCCACHE_BUCKET \
             -e CUSTOM_TEST_ARTIFACT_BUILD_DIR \
