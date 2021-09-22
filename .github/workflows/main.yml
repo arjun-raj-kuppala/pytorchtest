@@ -20,6 +20,11 @@ jobs:
     
     # The type of runner that the job will run on
     runs-on: self-hosted
+    env:
+      JOB_BASE_NAME: pytorch-linux-bionic-rocm4.2-py3.6-test
+      SCCACHE_BUCKET: ossci-compiler-cache-circleci-v2
+      CUSTOM_TEST_ARTIFACT_BUILD_DIR: build/custom_test_artifacts
+      TORCH_CUDA_ARCH_LIST: 5.2
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
