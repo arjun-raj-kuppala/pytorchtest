@@ -17,22 +17,44 @@ on:
 jobs:
   # This workflow contains a single job called "build"
   build:
+    
     # The type of runner that the job will run on
     runs-on: self-hosted
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - name: Checkout PyTorch
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # deep clone, to allow sharding to use git rev-list
+          submodules: recursive
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
+      - name: Preserve github env variables for use in docker
         run: |
-          echo Hello, world!
-          docker run --rm --cap-add=SYS_PTRACE --device=/dev/dri --device=/dev/kfd --device=/dev/mem --group-add daemon --security-opt seccomp=unconfined --shm-size=8G rocm/pytorch:rocm4.3_ubuntu18.04_py3.6_pytorch rocminfo
+          env | grep '^GITHUB' > "/tmp/github_env_${GITHUB_RUN_ID}"
 
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      - name: Build PyTorch
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          docker run \
+            -e BUILD_ENVIRONMENT \
+            -e JOB_BASE_NAME \
+            -e MAX_JOBS="$(nproc --ignore=2)" \
+            -e SCCACHE_BUCKET \
+            -e CUSTOM_TEST_ARTIFACT_BUILD_DIR \
+            -e SKIP_SCCACHE_INITIALIZATION=1 \
+            -e TORCH_CUDA_ARCH_LIST \
+            --env-file="/tmp/github_env_${GITHUB_RUN_ID}" \
+            --security-opt seccomp=unconfined \
+            --cap-add=SYS_PTRACE \
+            --tty \
+            --user jenkins \
+            -v "${GITHUB_WORKSPACE}:/var/lib/jenkins/workspace" \
+            -w /var/lib/jenkins/workspace \
+            --device=/dev/dri \
+            --device=/dev/kfd \
+            --device=/dev/mem \
+            --group-add daemon \
+            --shm-size=8G \
+            rocm/pytorch:rocm4.3_ubuntu18.04_py3.6_pytorch \
+            sh -c 'sudo chown -R jenkins . && .jenkins/pytorch/build.sh'
