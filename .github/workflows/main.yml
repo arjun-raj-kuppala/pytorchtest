@@ -56,5 +56,6 @@ jobs:
             --device=/dev/mem \
             --group-add daemon \
             --shm-size=8G \
+            --entrypoint='' \
             rocm/pytorch:rocm4.3_ubuntu18.04_py3.6_pytorch \
             sh -c 'sudo chown -R jenkins . && .jenkins/pytorch/build.sh'
