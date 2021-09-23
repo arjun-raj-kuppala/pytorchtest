@@ -54,11 +54,12 @@ jobs:
             --tty \
             -v "${GITHUB_WORKSPACE}:/var/lib/jenkins/workspace" \
             -w /var/lib/jenkins/workspace \
+            --user=jenkins
             --device=/dev/dri \
             --device=/dev/kfd \
             --device=/dev/mem \
             --group-add daemon \
             --shm-size=8G \
             --entrypoint='' \
-            rocm/pytorch:rocm4.3_ubuntu18.04_py3.6_pytorch \
+            rocm/pytorch:rocm4.2_ubuntu18.04_py3.6 \
             sh -c 'sudo chown -R jenkins . && .jenkins/pytorch/build.sh'
