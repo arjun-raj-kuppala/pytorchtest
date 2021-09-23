@@ -54,7 +54,7 @@ jobs:
             --tty \
             -v "${GITHUB_WORKSPACE}:/var/lib/jenkins/workspace" \
             -w /var/lib/jenkins/workspace \
-            --user=jenkins
+            --user=jenkins \
             --device=/dev/dri \
             --device=/dev/kfd \
             --device=/dev/mem \
